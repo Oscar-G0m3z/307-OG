@@ -23,13 +23,6 @@ function TableBody(props) {
       		Delete
     		</button>
   	</td>
-	<tr key={index}>
-	<td>
-		<button onClick={() => props.removeCharacter(index)}>
-		Add
-		</button>
-  	</td>
-	</tr>
       </tr>
     );
   }

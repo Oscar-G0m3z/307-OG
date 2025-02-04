@@ -32,7 +32,7 @@ function MyApp() {
 			characterData={characters} 
     			removeCharacter={removeOneCharacter}
 			/>
-		<Form />
+			<Form handleSubmit={updateList}/>
 		</div>
 		);
 	function removeOneCharacter(index) {
@@ -41,6 +41,11 @@ function MyApp() {
 		});
 		setCharacters(updated);
   	}
+	function updateList(person) {
+  		setCharacters([...characters, person]);
+	}
 }
+
+
 export default MyApp;
 

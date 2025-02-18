@@ -48,6 +48,13 @@ const addUser = (user) => {
   return user;
 };
 
+	const deleteUser = (user) => {
+  		users["users_list"].push(user);
+  		return user;
+	};
+
+
+
 app.use(express.json());
 
 // Root route

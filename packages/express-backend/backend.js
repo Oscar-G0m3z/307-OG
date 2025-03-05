@@ -35,6 +35,10 @@ const users = {
   ]
 };
 
+function generateRandomId() {
+  return Math.floor(Math.random() * 10000).toString();  // Generate a random number between 0 and 9999
+}
+
 const findUserByName = (name) => {
   return users["users_list"].filter(
     (user) => user["name"] === name
@@ -86,12 +90,37 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  
+  const newId = generateRandomId();
+
+  const userWithId = {
+    ...userToAdd,
+    
+    id: newId,  // Add the generated ID to the user object
+  };
+  
+  console.log
+
+  users.users_list.push(userWithId);
+  
+  //201 Content Created
+  res.status(201).json({ message: "User created successfully", user: userToAdd });
 });
 
 app.listen(port, () => {
   console.log(
     `Example app listening at http://localhost:${port}`
   );
+
+  app.delete("/users/:id", (req, res) => {
+    const userId = req.params.id; // Get the ID from the URL
+    const index = users.users_list.findIndex(user => user.id === userId); // Find the user by ID
+  
+    if (index !== -1) {
+      users.splice(index, 1); // Remove the user from the users list
+      res.status(204).send(); // Send HTTP 204 No Content status code to indicate successful deletion
+    } else {
+      res.status(404).json({ error: "User not found" }); // Send HTTP 404 Not Found if user does not exist
+    }
+  });
 }); 

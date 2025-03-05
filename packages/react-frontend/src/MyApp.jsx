@@ -30,9 +30,7 @@ function MyApp() {
 		fetchUsers()
 		  .then((res) => res.json())
 		  .then((json) => setCharacters(json["users_list"]))
-		  .catch((error) => {
-			console.log(error);
-		  });
+		  .catch((error) => {console.log(error)});
 	  }, []);
 	  
 	return (
@@ -44,12 +42,37 @@ function MyApp() {
 			<Form handleSubmit={updateList}/>
 		</div>
 		);
-	function removeOneCharacter(index) {
+	/*function removeOneCharacter(index) {
 		const updated = characters.filter((character, i) => {
 		return i !== index;
 		});
 		setCharacters(updated);
-  	}
+  	}*/
+	// how to delete
+	  function removeOneCharacter(index) {
+		// Make DELETE request to backend
+		console.log(characters[index])
+		const id = characters[index].id
+		fetch(`http://localhost:8000/users/${id}`, {
+		  method: 'DELETE',
+		})
+		  .then((res) => {
+			if (res.status === 204) {
+			  // If the DELETE request was successful, remove the user from the state
+			  setCharacters((prevCharacters) =>
+				prevCharacters.filter((character) => character.id !== id)
+			  );
+			  console.log(`User with ID ${id} deleted.`);
+			} else if (res.status === 404) {
+			  // If the user was not found, log an error
+			  console.log(`User with ID ${id} not found.`);
+			}
+		  })
+		  .catch((error) => {
+			console.error('Error deleting user:', error);
+		  });
+	  }
+	
 	function updateList(person) {
 		postUser(person)
 		.then(() => setCharacters([...characters, person]))
@@ -64,7 +87,7 @@ function MyApp() {
 	  }
 	
 	function postUser(person) {
-		const promise = fetch("Http://localhost:8000/users", {
+		const promise = fetch("http://localhost:8000/users", {
 		  method: "POST",
 		  headers: {
 			"Content-Type": "application/json"

@@ -114,10 +114,9 @@ app.listen(port, () => {
 
   app.delete("/users/:id", (req, res) => {
     const userId = req.params.id; // Get the ID from the URL
-    const index = users.users_list.findIndex(user => user.id === userId); // Find the user by ID
+    users["users_list"] = users["users_list"].filter(user => user["id"] !== userId); // Find the user by ID
   
-    if (index !== -1) {
-      users.splice(index, 1); // Remove the user from the users list
+    if (users["users_list"] != undefined) {
       res.status(204).send(); // Send HTTP 204 No Content status code to indicate successful deletion
     } else {
       res.status(404).json({ error: "User not found" }); // Send HTTP 404 Not Found if user does not exist

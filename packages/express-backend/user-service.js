@@ -1,49 +1,16 @@
-import mongoose from "mongoose";
-import userModel from "../models/user.js";
+import userModel from "./models/user.js";
 
-mongoose.set("debug", true);
-
-mongoose
-  .connect("mongodb://localhost:27017/users", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((error) => console.log(error));
-
-function getUsers(name, job) {
-  let promise;
-  if (name === undefined && job === undefined) {
-    promise = userModel.find();
-  } else if (name && !job) {
-    promise = findUserByName(name);
-  } else if (job && !name) {
-    promise = findUserByJob(job);
+async function addUser(user) {
+  try {
+    console.log("📩 Attempting to save user:", user); // Debugging line
+    const userToAdd = new userModel(user);
+    const savedUser = await userToAdd.save();
+    console.log("✅ User successfully saved:", savedUser); // Debugging line
+    return savedUser;
+  } catch (error) {
+    console.error("❌ Error saving user:", error);
+    throw error;
   }
-  return promise;
 }
 
-function findUserById(id) {
-  return userModel.findById(id);
-}
-
-function addUser(user) {
-  const userToAdd = new userModel(user);
-  const promise = userToAdd.save();
-  return promise;
-}
-
-function findUserByName(name) {
-  return userModel.find({ name: name });
-}
-
-function findUserByJob(job) {
-  return userModel.find({ job: job });
-}
-
-export default {
-  addUser,
-  getUsers,
-  findUserById,
-  findUserByName,
-  findUserByJob,
-};
+export default { addUser };

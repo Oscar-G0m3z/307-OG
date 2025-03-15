@@ -1,5 +1,5 @@
 import express from "express";
-import userService from "./user-services.js";
+import userService from "./user-service.js";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
@@ -7,38 +7,30 @@ dotenv.config();
 
 const { MONGO_CONNECTION_STRING } = process.env;
 
-mongoose.set("debug", true);
+mongoose.set("debug", true); // Enables MongoDB query logging in the console
+
 mongoose
-  .connect(MONGO_CONNECTION_STRING + "users") // connect to Db "users"
-  .catch((error) => console.log(error));
-  
+  .connect(MONGO_CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((error) => console.error("❌ MongoDB connection error:", error));
+
 const app = express();
 app.use(express.json());
 
-app.get("/users", (req, res) => {
-  const { name, job } = req.query;
-  userService
-    .getUsers(name, job)
-    .then((users) => res.json(users))
-    .catch((error) => res.status(500).json({ error: error.message }));
-});
-
-app.get("/users/:id", (req, res) => {
-  userService
-    .findUserById(req.params.id)
-    .then((user) => {
-      if (user) res.json(user);
-      else res.status(404).json({ error: "User not found" });
-    })
-    .catch((error) => res.status(500).json({ error: error.message }));
-});
-
-app.post("/users", (req, res) => {
-  userService
-    .addUser(req.body)
-    .then((newUser) => res.status(201).json(newUser))
-    .catch((error) => res.status(500).json({ error: error.message }));
+app.post("/users", async (req, res) => {
+  try {
+    console.log("📩 Received request body:", req.body); // Log received data
+    const newUser = await userService.addUser(req.body);
+    console.log("✅ User saved in DB:", newUser); // Log saved user
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error("❌ Error adding user:", error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
